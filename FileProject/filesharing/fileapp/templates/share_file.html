@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share File | File Sharing</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #007BFF, #0056b3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .file-name {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Share Link Box */
+        .share-link {
+            display: block;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            word-wrap: break-word;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 15px;
+            overflow-wrap: break-word;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            color: white;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-btn {
+            background-color: #28a745;
+            margin-top: 12px;
+        }
+
+        .copy-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔗 Share Your File</h2>
+        
+        <p class="file-name">📂 File: <strong>{{ file.name }}</strong></p>
+
+        <div class="share-link" id="share-link">{{ request.build_absolute_uri }}</div>
+
+        <button class="btn copy-btn" onclick="copyToClipboard()">📋 Copy Link</button>
+
+        <a href="{% url 'view_files' %}" class="back-btn">⬅ Back to My Files</a>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            var link = document.getElementById("share-link");
+            var tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = link.textContent;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("✅ Share link copied to clipboard!");
+        }
+    </script>
+
+</body>
+</html>

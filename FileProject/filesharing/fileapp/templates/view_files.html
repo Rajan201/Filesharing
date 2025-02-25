@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Files | File Sharing</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #007BFF, #0056b3);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Search Bar */
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #searchInput:focus {
+            border-color: #007bff;
+            box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+        }
+
+        /* File List */
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .file-name:hover {
+            color: #0056b3;
+        }
+
+        /* File Action Buttons */
+        .file-actions a, .file-actions form button {
+            text-decoration: none;
+            margin: 0 5px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .download-btn {
+            background-color: #28a745;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .share-btn {
+            background-color: #17a2b8;
+        }
+
+        .share-btn:hover {
+            background-color: #138496;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Upload & Logout Buttons */
+        .upload-btn, .logout-btn {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-btn {
+            background-color: #007bff;
+        }
+
+        .upload-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .file-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>📂 My Uploaded Files</h2>
+
+        <!-- Search Bar -->
+        <input type="text" id="searchInput" onkeyup="searchFiles()" placeholder="🔍 Search files by name...">
+
+        {% if files %}
+        <ul class="file-list" id="fileList">
+            {% for file in files %}
+            <li class="file-item">
+                <a href="{{ file.file.url }}" target="_blank" class="file-name">{{ file.name }}</a>
+                <div class="file-actions">
+                    <a href="{{ file.file.url }}" download class="download-btn">⬇️ Download</a>
+                    <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'share_file' file.share_link %}" class="share-btn">🔗 Share</a>
+                    <form action="{% url 'delete_file' file.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn">❌ Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="text-align: center; color: #777;">No files uploaded yet.</p>
+        {% endif %}
+
+        <a href="{% url 'upload_file' %}" class="upload-btn">📤 Upload More Files</a>
+        <a href="{% url 'logout' %}" class="logout-btn">🚪 Logout</a>
+    </div>
+
+    <script>
+        function searchFiles() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let files = document.querySelectorAll(".file-item");
+
+            files.forEach(file => {
+                let fileName = file.querySelector(".file-name").textContent.toLowerCase();
+                file.style.display = fileName.includes(input) ? "flex" : "none";
+            });
+        }
+    </script>
+
+</body>
+</html>
